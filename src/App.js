@@ -2,7 +2,24 @@ import React, { Component } from "react";
 import axios from 'axios';
 import "./App.css";
 
-const apiEndpoint = 'https://jsonplaceholder.typicode.com/posts';
+axios.interceptors.response.use(null, error => {
+
+  const expectedError = error.response && error.response.status >= 400 && error.response.status < 500;
+
+  // unexpected errors (erros that shouldn't occur: network down, server down, database down, bug)
+  // - Log them
+  // - display a generic and freindly error message
+
+  if (!expectedError) {
+    console.log('logging the error', error);
+    alert('unexpected error occured');
+  }
+
+  return Promise.reject(error);
+
+});
+
+const apiEndpoint = 'https://jsonplaceholder.typicode.com';
 
 class App extends Component {
   state = {
@@ -10,7 +27,7 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    const { data: posts } = await axios.get(apiEndpoint);
+    const { data: posts } = await axios.get(apiEndpoint + '/posts');
 
     this.setState({ posts });
 
@@ -19,7 +36,7 @@ class App extends Component {
   handleAdd = async () => {
     const obj = { title: 'a', body: 'b' };
 
-    const { data: post } = await axios.post(apiEndpoint, obj);
+    const { data: post } = await axios.post(apiEndpoint + '/posts', obj);
 
     const posts = [post, ...this.state.posts];
 
@@ -30,7 +47,7 @@ class App extends Component {
   handleUpdate = async post => {
 
     post.title = 'UPDATE';
-    const { data } = await axios.put(apiEndpoint + '/' + post.id, post);
+    const { data } = await axios.put(apiEndpoint + '/posts/' + post.id, post);
     // axios.patch(apiEndpoint + '/' + post.id, { title: post.title }); // update specific part of the post object
 
     const posts = [...this.state.posts];
@@ -52,7 +69,7 @@ class App extends Component {
     this.setState({ posts });
 
     try {
-      await axios.delete('s' + apiEndpoint + "/b5");
+      await axios.delete(apiEndpoint + '/posts/' + post.id);
     } catch (ex) {
 
       // ex.request
@@ -63,16 +80,8 @@ class App extends Component {
 
       if (ex.response && ex.response.status === 404) {
         alert('this post has already been deleted');
-      } else {
-        console.log('logging the error');
-        alert('unexpected error occured');
       }
 
-      // unexpected (erros that shouldn't occur: network down, server down, database down, bug)
-      // - Log them
-      // - display a generic and freindly error message
-
-      alert('something failed');
       this.setState({ posts: originalPosts });
 
     }
