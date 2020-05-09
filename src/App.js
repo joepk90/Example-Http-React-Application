@@ -2,13 +2,15 @@ import React, { Component } from "react";
 import axios from 'axios';
 import "./App.css";
 
+const apiEndpoint = 'https://jsonplaceholder.typicode.com/posts';
+
 class App extends Component {
   state = {
     posts: []
   };
 
   async componentDidMount() {
-    const { data: posts } = await axios.get('https://jsonplaceholder.typicode.com/posts');
+    const { data: posts } = await axios.get(apiEndpoint);
 
     this.setState({ posts });
 
