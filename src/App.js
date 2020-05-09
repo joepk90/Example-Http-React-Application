@@ -1,8 +1,7 @@
 import React, { Component } from "react";
 import http from './services/httpService'
 import "./App.css";
-
-const apiEndpoint = 'https://jsonplaceholder.typicode.com';
+import config from './config.json'
 
 class App extends Component {
   state = {
@@ -10,7 +9,7 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    const { data: posts } = await http.get(apiEndpoint + '/posts');
+    const { data: posts } = await http.get(config.apiEndpoint + '/posts');
 
     this.setState({ posts });
 
@@ -19,7 +18,7 @@ class App extends Component {
   handleAdd = async () => {
     const obj = { title: 'a', body: 'b' };
 
-    const { data: post } = await http.post(apiEndpoint + '/posts', obj);
+    const { data: post } = await http.post(config.apiEndpoint + '/posts', obj);
 
     const posts = [post, ...this.state.posts];
 
@@ -30,8 +29,8 @@ class App extends Component {
   handleUpdate = async post => {
 
     post.title = 'UPDATE';
-    const { data } = await http.put(apiEndpoint + '/posts/' + post.id, post);
-    // http.patch(apiEndpoint + '/' + post.id, { title: post.title }); // update specific part of the post object
+    const { data } = await http.put(config.apiEndpoint + '/posts/' + post.id, post);
+    // http.patch(config.apiEndpoint + '/' + post.id, { title: post.title }); // update specific part of the post object
 
     const posts = [...this.state.posts];
 
@@ -52,7 +51,7 @@ class App extends Component {
     this.setState({ posts });
 
     try {
-      await http.delete(apiEndpoint + '/posts/' + post.id);
+      await http.delete(config.apiEndpoint + '/posts/' + post.id);
     } catch (ex) {
 
       // ex.request
