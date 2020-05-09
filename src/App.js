@@ -1,23 +1,6 @@
 import React, { Component } from "react";
-import axios from 'axios';
+import http from './services/httpService'
 import "./App.css";
-
-axios.interceptors.response.use(null, error => {
-
-  const expectedError = error.response && error.response.status >= 400 && error.response.status < 500;
-
-  // unexpected errors (erros that shouldn't occur: network down, server down, database down, bug)
-  // - Log them
-  // - display a generic and freindly error message
-
-  if (!expectedError) {
-    console.log('logging the error', error);
-    alert('unexpected error occured');
-  }
-
-  return Promise.reject(error);
-
-});
 
 const apiEndpoint = 'https://jsonplaceholder.typicode.com';
 
@@ -27,7 +10,7 @@ class App extends Component {
   };
 
   async componentDidMount() {
-    const { data: posts } = await axios.get(apiEndpoint + '/posts');
+    const { data: posts } = await http.get(apiEndpoint + '/posts');
 
     this.setState({ posts });
 
@@ -36,7 +19,7 @@ class App extends Component {
   handleAdd = async () => {
     const obj = { title: 'a', body: 'b' };
 
-    const { data: post } = await axios.post(apiEndpoint + '/posts', obj);
+    const { data: post } = await http.post(apiEndpoint + '/posts', obj);
 
     const posts = [post, ...this.state.posts];
 
@@ -47,8 +30,8 @@ class App extends Component {
   handleUpdate = async post => {
 
     post.title = 'UPDATE';
-    const { data } = await axios.put(apiEndpoint + '/posts/' + post.id, post);
-    // axios.patch(apiEndpoint + '/' + post.id, { title: post.title }); // update specific part of the post object
+    const { data } = await http.put(apiEndpoint + '/posts/' + post.id, post);
+    // http.patch(apiEndpoint + '/' + post.id, { title: post.title }); // update specific part of the post object
 
     const posts = [...this.state.posts];
 
@@ -69,7 +52,7 @@ class App extends Component {
     this.setState({ posts });
 
     try {
-      await axios.delete(apiEndpoint + '/posts/' + post.id);
+      await http.delete(apiEndpoint + '/posts/' + post.id);
     } catch (ex) {
 
       // ex.request
